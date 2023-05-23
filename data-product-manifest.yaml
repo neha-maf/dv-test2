@@ -93,7 +93,7 @@ dataQualityCheck:
           number: 0.9
   NullCombinationCheck:
     stateManagement:
-      referenceAlias: car_input_port
+      referenceAlias: car_prices_barcelona
       checks:
         - columns:
             - brand
