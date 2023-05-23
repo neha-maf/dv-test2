@@ -1,0 +1,171 @@
+---
+version: 0.0.1
+discoveryPort:
+  name: Suspend Scenario 22-May-23-Ufo-4
+  alias: TestMultiTransform_01
+  shortDescription: Test search functionality
+  longDescription: search maximum characters for long description
+  tags:
+    - Dataverse
+    - Finance
+  versionInformation: '0.1'
+  urn: urn:dv:dataproduct:6d4714c3
+  organization: MAF
+  createdBy: Ashwini
+  createdOn: '212249844399'
+  fromMinDataDate: '2022-04-07'
+  toMaxDataDate: '2022-04-14'
+  lastUpdated: '2022-04-07'
+  refreshFrequency: Daily
+  industryDomain: Money
+  function: Retail
+  regulatoryFields:
+    privacy_PublicOrPrivate: Public
+    customerSpecific_PIIOrnonPII: non-PII
+    origin_MachineGeneratedOrHumanGenerated: Machine generated
+    monetary_FinancialOrnoFinancialData: non-financial
+  qualityInformation:
+    dataAccuracy: 95%
+  authorisation-Information:
+    organization: MAF, Accenture
+    geography:
+      type: state
+      value: Bengaluru
+    industryDomain:
+    - ArtificialIntelligence , dataAnalytics
+    refreshInterval: Daily
+    typeofAuthorisation-InclusionExclusion: Inclusion
+  category: client
+  image: http://google.com
+  autofillUserinfo: true
+  extra: {}
+inputPorts:
+  - alias: car_input_port
+    description: string
+    tags: []
+    extra: {}
+    syncType: pull
+    type: s3
+    dataSetUrn: urn:dv:dataset:43865a02-f13a-4d26-91dd-3a5e4910555d
+    entityId:
+      createEntity: true
+      entityPath: "s3a://dp-input-bucket/user_car_prices_barcelona_2022/"
+      entityFilterPatternMatch: "*"
+      incrementalLoad: false
+      sourceSchemaUrn: urn:dv:schema:9d4716d4
+      projectSchemaUrn: urn:dv:schema:9d4716d6
+      fileFormat: parquet
+      delimiter: ","
+      header: true
+      filter: brand = 'BMW'
+      processingTimeColumn:
+        - processing_time
+      actualTimeColumn:
+        - processing_time
+      projection:
+        - brand
+        - model
+        - engine
+        - year
+        - location
+dataQualityCheck:
+  RecordCountCheck:
+    inputPort:
+      - referenceAlias: car_input_port
+        expression: ">="
+        number: 100
+    stateManagement:
+      referenceAlias: car_prices_barcelona
+      expression: ==
+      number: 100
+  NullValueCheck:
+    inputPort:
+      - referenceAlias: car_input_port
+        checks:
+          - column: year
+            expression: ">="
+            number: 9
+    stateManagement:
+      referenceAlias: car_prices_barcelona
+      checks:
+        - column: brand
+          expression: ">="
+          number: 0.9
+  NullCombinationCheck:
+    stateManagement:
+      referenceAlias: car_input_port
+      checks:
+        - columns:
+            - brand
+            - model
+          expression: ">="
+          number: 0.99
+  UnacceptableTextValueCheck:
+    inputPort:
+      - referenceAlias: car_input_port
+        checks:
+          - column: year
+            valueList:
+              - 2022
+            number: 0.95
+            expression: ">="
+    stateManagement:
+      referenceAlias: car_prices_barcelona
+      checks:
+          - column: year
+            valueList:
+              - 2022
+            number: 0.95
+            expression: ">="
+  UniqueCombinationCheck:
+    inputPort:
+      - referenceAlias: car_input_port
+        checks:
+          - columns:
+              - brand
+              - model
+    stateManagement:
+      referenceAlias: car_prices_barcelona
+      checks:
+        - columns:
+            - brand
+            - model
+stateManagement:
+  alias: car_prices_barcelona
+  refreshInterval: "*/4 * * * *"
+  updateStrategy: append
+  productStoreState:
+    logicalSchema:
+      properties:
+        brand:
+          type: string
+        model:
+          type: string
+        engine:
+          type: string
+        year:
+          type: string
+        location:
+          type: string
+  retentionVersions: "10"
+transformation:
+    - alias: "car_price_step_1"
+      description: "step_1"
+      type: "SQL"
+      query: "SELECT * FROM car_input_port"
+      references:
+        - alias: 'car_input_port'
+          sqlReference: 'car_input_port'
+    - alias: "car_price_step_2"
+      description: "step_2"
+      query: "SELECT * FROM car_price_step_1"
+      type: "SQL"
+      references:
+        - alias: 'car_price_step_1'
+          sqlReference: 'car_price_step_1'
+outputPort:
+  channels:
+    - channelType: REST-API
+      queryType: SQL
+    - channelType: JDBC
+      queryType: SQL
