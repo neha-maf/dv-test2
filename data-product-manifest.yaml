@@ -100,23 +100,6 @@ dataQualityCheck:
             - model
           expression: ">="
           number: 0.99
-  UnacceptableTextValueCheck:
-    inputPort:
-      - referenceAlias: car_input_port
-        checks:
-          - column: year
-            valueList:
-              - 2022
-            number: 0.95
-            expression: ">="
-    stateManagement:
-      referenceAlias: car_prices_barcelona
-      checks:
-          - column: year
-            valueList:
-              - 2022
-            number: 0.95
-            expression: ">="
   UniqueCombinationCheck:
     inputPort:
       - referenceAlias: car_input_port
