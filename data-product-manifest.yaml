@@ -1,12 +1,10 @@
----
 version: 0.1.0
-alias: test_dataproduct_neha_v1001
+alias: test_dataproduct_neha_v100
 discoveryPort:
-  name: Average Car prices in Barcelona in 2022
+  name: Average Car prices in Barcelona - 2022
   description: Average car price in barcelona
   domain:
     - customer
-
 inputPorts:
   - alias: car_input_port
     description: string
@@ -16,17 +14,16 @@ inputPorts:
     type: s3-parquet
     filter: brand = 'BMW'
     projection:
-        - brand
-        - model
-        - engine
-        - year
-        - location
-    connectionUrn: urn:dv:connection:e6256cc3-386f-4a45-8c6e-5c32ea4287ca
+      - brand
+      - model
+      - engine
+      - year
+      - location
+    connectionUrn: 'urn:dv:connection:e6256cc3-386f-4a45-8c6e-5c32ea4287ca'
     dataSet:
-      path: "s3a://dp-input-bucket/user_car_prices_barcelona_2022/"
-      delimiter: ","
+      path: 's3a://dp-input-bucket/user_car_prices_barcelona_2022/'
+      delimiter: ','
       header: true
-
 productState:
   updateType: scheduled
   updateSchedule: '*/10 * * * *'
@@ -43,26 +40,23 @@ productState:
         type: string
       location:
         type: string
-
 transformation:
   - alias: car_price_all
     sequenceNo: 1
     type: sql
     description: Get everything from car prices
     query: select * from car_input_port
-    
 controlPort:
   dataQualityRules:
     RecordCountCheck:
       inputPort:
         - referenceAlias: car_input_port
-          expression: "<="
-          number: 1
+          expression: '>='
+          number: 10
       productState:
-          referenceAlias: test_dataproduct_neha_v100
-          expression: "<="
-          number: 1
-          
+        referenceAlias: test_dataproduct_neha_v100
+        expression: '>='
+        number: 10
 outputPort:
   subscriptionChannels:
     - channelType: jdbc
