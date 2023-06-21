@@ -1,154 +1,71 @@
 ---
-version: 0.0.1
+version: 0.1.0
+alias: test_dataproduct_neha_v1001
 discoveryPort:
-  name: Car Prices in London 2022
-  alias: TestMultiTransform_01
-  shortDescription: This data product provides car prices in London for various cars in the year 2022
-  longDescription: This data product provides car prices in London for various cars in the year 2022
-  tags:
-    - Dataverse
-    - Finance
-  versionInformation: '0.1'
-  urn: urn:dv:dataproduct:6d4714c3
-  organization: MAF
-  createdBy: Ashwini
-  createdOn: '212249844399'
-  fromMinDataDate: '2022-04-07'
-  toMaxDataDate: '2022-04-14'
-  lastUpdated: '2022-04-07'
-  refreshFrequency: Daily
-  industryDomain: Money
-  function: Retail
-  regulatoryFields:
-    privacy_PublicOrPrivate: Public
-    customerSpecific_PIIOrnonPII: non-PII
-    origin_MachineGeneratedOrHumanGenerated: Machine generated
-    monetary_FinancialOrnoFinancialData: non-financial
-  qualityInformation:
-    dataAccuracy: 95%
-  authorisation-Information:
-    organization: MAF, Accenture
-    geography:
-      type: state
-      value: Bengaluru
-    industryDomain:
-    - ArtificialIntelligence , dataAnalytics
-    refreshInterval: Daily
-    typeofAuthorisation-InclusionExclusion: Inclusion
-  category: client
-  image: http://google.com
-  autofillUserinfo: true
-  extra: {}
+  name: Average Car prices in Barcelona in 2022
+  description: Average car price in barcelona
+  domain:
+    - customer
+
 inputPorts:
   - alias: car_input_port
     description: string
     tags: []
     extra: {}
     syncType: pull
-    type: s3
-    dataSetUrn: urn:dv:dataset:43865a02-f13a-4d26-91dd-3a5e4910555d
-    entityId:
-      createEntity: true
-      entityPath: "s3a://dp-input-bucket/user_car_prices_barcelona_2022/"
-      entityFilterPatternMatch: "*"
-      incrementalLoad: false
-      sourceSchemaUrn: urn:dv:schema:9d4716d4
-      projectSchemaUrn: urn:dv:schema:9d4716d6
-      fileFormat: parquet
-      delimiter: ","
-      header: true
-      filter: brand = 'BMW'
-      processingTimeColumn:
-        - processing_time
-      actualTimeColumn:
-        - processing_time
-      projection:
+    type: s3-parquet
+    filter: brand = 'BMW'
+    projection:
         - brand
         - model
         - engine
         - year
         - location
-dataQualityCheck:
-  RecordCountCheck:
-    inputPort:
-      - referenceAlias: car_input_port
-        expression: ">="
-        number: 100
-    stateManagement:
-      referenceAlias: car_prices_barcelona
-      expression: ==
-      number: 100
-  NullValueCheck:
-    inputPort:
-      - referenceAlias: car_input_port
-        checks:
-          - column: year
-            expression: ">="
-            number: 9
-    stateManagement:
-      referenceAlias: car_prices_barcelona
-      checks:
-        - column: brand
-          expression: ">="
-          number: 0.9
-  NullCombinationCheck:
-    stateManagement:
-      referenceAlias: car_prices_barcelona
-      checks:
-        - columns:
-            - brand
-            - model
-          expression: ">="
-          number: 0.99
-  UniqueCombinationCheck:
-    inputPort:
-      - referenceAlias: car_input_port
-        checks:
-          - columns:
-              - brand
-              - model
-    stateManagement:
-      referenceAlias: car_prices_barcelona
-      checks:
-        - columns:
-            - brand
-            - model
-stateManagement:
-  alias: car_prices_barcelona
-  refreshInterval: "*/4 * * * *"
+    connectionUrn: urn:dv:connection:e6256cc3-386f-4a45-8c6e-5c32ea4287ca
+    dataSet:
+      path: "s3a://dp-input-bucket/user_car_prices_barcelona_2022/"
+      delimiter: ","
+      header: true
+
+productState:
+  updateType: scheduled
+  updateSchedule: '*/10 * * * *'
   updateStrategy: append
-  productStoreState:
-    logicalSchema:
-      properties:
-        brand:
-          type: string
-        model:
-          type: string
-        engine:
-          type: string
-        year:
-          type: string
-        location:
-          type: string
-  retentionVersions: "10"
+  logicalSchema:
+    properties:
+      brand:
+        type: string
+      model:
+        type: string
+      engine:
+        type: string
+      year:
+        type: string
+      location:
+        type: string
+
 transformation:
-    - alias: "car_price_step_1"
-      description: "step_1"
-      type: "SQL"
-      query: "SELECT * FROM car_input_port"
-      references:
-        - alias: 'car_input_port'
-          sqlReference: 'car_input_port'
-    - alias: "car_price_step_2"
-      description: "step_2"
-      query: "SELECT * FROM car_price_step_1"
-      type: "SQL"
-      references:
-        - alias: 'car_price_step_1'
-          sqlReference: 'car_price_step_1'
+  - alias: car_price_all
+    sequenceNo: 1
+    type: sql
+    description: Get everything from car prices
+    query: select * from car_input_port
+    
+controlPort:
+  dataQualityRules:
+    RecordCountCheck:
+      inputPort:
+        - referenceAlias: car_input_port
+          expression: "<=1"
+          number: 1
+      productState:
+        - referenceAlias: test_dataproduct_neha_v100
+          expression: "<="
+          number: 1
+          
 outputPort:
-  channels:
-    - channelType: REST-API
-      queryType: SQL
-    - channelType: JDBC
-      queryType: SQL
+  subscriptionChannels:
+    - channelType: jdbc
+      queryType: sql
+    - channelType: rest-api
+      queryType: sql
