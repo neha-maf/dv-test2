@@ -1,7 +1,7 @@
 version: 0.1.0
 alias: test_dataproduct_neha_v101
 discoveryPort:
-  name: Best Average Car prices in Barcelona for 2022
+  name: Best Average Car prices in Barcelona for 2022 nnn
   shortDescription: This is Maf XConnect Customer Segment manifest
   longDescription: This is Maf XConnect Customer Segment manifest
   tags:
