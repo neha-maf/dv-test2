@@ -59,7 +59,7 @@ controlPort:
           expression: "<="
           number: 1
       productState:
-        - referenceAlias: test_dataproduct_neha_v100
+          referenceAlias: test_dataproduct_neha_v100
           expression: "<="
           number: 1
           
