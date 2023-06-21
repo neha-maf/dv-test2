@@ -51,12 +51,12 @@ controlPort:
     RecordCountCheck:
       inputPort:
         - referenceAlias: car_input_port
-          expression: '>='
-          number: 10
+          expression: '<='
+          number: 1
       productState:
         referenceAlias: test_dataproduct_neha_v100
-        expression: '>='
-        number: 10
+        expression: '<='
+        number: 1
 outputPort:
   subscriptionChannels:
     - channelType: jdbc
