@@ -1,7 +1,7 @@
 version: 0.1.0
 alias: test_dataproduct_neha_v101
 discoveryPort:
-  name: Best Average Car prices in Barcelona in 2022
+  name: Best Average Car prices in Barcelona for 2022
   description: Average car price in barcelona
   domain:
     - customer
@@ -52,11 +52,11 @@ controlPort:
       inputPort:
         - referenceAlias: car_input_port
           expression: '<='
-          number: 1
+          number: 2
       productState:
         referenceAlias: test_dataproduct_neha_v100
         expression: '<='
-        number: 1
+        number: 2
 outputPort:
   subscriptionChannels:
     - channelType: jdbc
