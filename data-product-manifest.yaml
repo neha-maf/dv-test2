@@ -1,7 +1,7 @@
 version: 0.1.0
-alias: test_dataproduct_neha_v100
+alias: test_dataproduct_neha_v101
 discoveryPort:
-  name: Average Car prices in Barcelona - 2022
+  name: Average Car prices in Barcelona in 2022
   description: Average car price in barcelona
   domain:
     - customer
