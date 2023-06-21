@@ -2,9 +2,18 @@ version: 0.1.0
 alias: test_dataproduct_neha_v101
 discoveryPort:
   name: Best Average Car prices in Barcelona for 2022
-  description: Average car price in barcelona
-  domain:
-    - customer
+  shortDescription: This is Maf XConnect Customer Segment manifest
+  longDescription: This is Maf XConnect Customer Segment manifest
+  tags:
+    - MAF Data
+    - Schedule Run
+  domain: ['Finance']
+  function: ['Forecast']
+  regulatoryFields:
+    dataPrivacy: public
+    customerInfo: nonPII
+    dataOrigin: machineGenerated
+    monetaryInfo: nonFinancialData
 inputPorts:
   - alias: car_input_port
     description: string
