@@ -56,7 +56,7 @@ controlPort:
     RecordCountCheck:
       inputPort:
         - referenceAlias: car_input_port
-          expression: "<=1"
+          expression: "<="
           number: 1
       productState:
         - referenceAlias: test_dataproduct_neha_v100
